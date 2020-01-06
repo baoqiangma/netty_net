@@ -17,6 +17,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpContent;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
@@ -26,7 +27,7 @@ import io.netty.handler.codec.http.LastHttpContent;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class NHTTPServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+public class NHTTPServerHandler extends SimpleChannelInboundHandler<Object> {
 
 	public HashMap<String, Handler> getHandlers = new HashMap<>();
 	public HashMap<String, Handler> postHandlers = new HashMap<>();
@@ -45,12 +46,14 @@ public class NHTTPServerHandler extends SimpleChannelInboundHandler<HttpObject> 
 	}
 
 	@Override
-	public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
+	public void channelRead0(ChannelHandlerContext ctx, Object msg) {
 		if (msg instanceof HttpRequest) {
+
 			HttpRequest req = (HttpRequest) msg;
 			obj.setHeaders(req.headers());
 			obj.setUri(req.uri());
 			obj.setMethod(req.method());
+
 		} else if (msg instanceof LastHttpContent) {
 			LastHttpContent req = (LastHttpContent) msg;
 
@@ -59,7 +62,6 @@ public class NHTTPServerHandler extends SimpleChannelInboundHandler<HttpObject> 
 			if (obj.getMethod() == HttpMethod.GET) {
 				result = getHandlers.getOrDefault(obj.getUri(), (data) -> {
 					return null;
-
 				}).handler(obj);
 			} else if (obj.getMethod() == HttpMethod.POST) {
 				result = postHandlers.getOrDefault(obj.getUri(), (data) -> {
@@ -71,13 +73,13 @@ public class NHTTPServerHandler extends SimpleChannelInboundHandler<HttpObject> 
 				FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.wrappedBuffer(result.toString().getBytes()));
 				response.headers().set(CONTENT_TYPE, TEXT_PLAIN).setInt(CONTENT_LENGTH, response.content().readableBytes());
 				ChannelFuture f = ctx.writeAndFlush(response);
-				log.info("handler result ={}",result);
+				log.info("handler result ={}", result);
 				f.addListener(ChannelFutureListener.CLOSE);
 			} else {
 				FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
 				response.headers().set(CONTENT_TYPE, TEXT_PLAIN).setInt(CONTENT_LENGTH, response.content().readableBytes());
 				ChannelFuture f = ctx.writeAndFlush(response);
-				log.info("handler is not exiest");
+				log.info("handler is not exiest ,handler is {}, content is {}", obj.uri, obj.getContent());
 
 				f.addListener(ChannelFutureListener.CLOSE);
 			}

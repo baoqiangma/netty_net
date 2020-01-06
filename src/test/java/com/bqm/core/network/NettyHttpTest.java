@@ -3,13 +3,15 @@ package com.bqm.core.network;
 import com.bqm.core.network.netty.ServerConfig;
 import com.bqm.core.network.netty.http.NHTTPServer;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class NettyHttpTest {
 
 	public static void main(String[] args) {
-		NHTTPServer server = new NHTTPServer();
+		NHTTPServer server = new NHTTPServer(true);
 
 		server.registGet("/test", handler -> {
 
@@ -23,8 +25,15 @@ public class NettyHttpTest {
 			return "test success !";
 			
 		});
+		server.registPost("/api/auth/login", handler -> {
+			
+			log.info(handler.getContent().toString());
+			return "{\"code\":2,\"message\":\"test.... \"}";
+			
+		});
 
-		server.bind(new ServerConfig("http_test", 8090, "*"));
+		server.bind(new ServerConfig("http_test", 9090, "*"));
 	}
 
+	
 }
