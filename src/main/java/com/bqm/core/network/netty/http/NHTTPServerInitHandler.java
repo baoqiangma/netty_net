@@ -12,12 +12,10 @@ import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
 
 public class NHTTPServerInitHandler extends ChannelInitializer<SocketChannel> {
 
-	public HashMap<String, Handler> getHandlers;
-	public HashMap<String, Handler> postHandlers;
+	protected NHTTPEvent event;
 
-	public NHTTPServerInitHandler(HashMap<String, Handler> getHandlers, HashMap<String, Handler> postHandlers) {
-		this.getHandlers = getHandlers;
-		this.postHandlers = postHandlers;
+	public NHTTPServerInitHandler(NHTTPEvent event) {
+		this.event = event;
 	}
 
 	@Override
@@ -25,7 +23,7 @@ public class NHTTPServerInitHandler extends ChannelInitializer<SocketChannel> {
 		ChannelPipeline p = ch.pipeline();
 		p.addLast(new HttpServerCodec());
 		p.addLast(new HttpServerExpectContinueHandler());
-		p.addLast(new NHTTPServerHandler(getHandlers, postHandlers));
+		p.addLast(new NHTTPServerHandler(event));
 	}
 
 }
