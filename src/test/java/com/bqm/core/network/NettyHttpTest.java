@@ -3,8 +3,7 @@ package com.bqm.core.network;
 import com.bqm.core.network.netty.ServerConfig;
 import com.bqm.core.network.netty.http.NHTTPServer;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,20 +19,19 @@ public class NettyHttpTest {
 
 		});
 		server.registPost("/test", handler -> {
-			
+
 			log.info(handler.getContent().toString());
 			return "test success !";
-			
+
 		});
 		server.registPost("/api/auth/login", handler -> {
-			
+
 			log.info(handler.getContent().toString());
 			return "{\"code\":2,\"message\":\"test.... \"}";
-			
+
 		});
 
 		server.bind(new ServerConfig("http_test", 9090, "*"));
 	}
 
-	
 }

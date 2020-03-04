@@ -1,9 +1,5 @@
 package com.bqm.core.network.netty.http;
 
-import java.util.HashMap;
-
-import com.bqm.core.network.netty.http.NHTTPServer.Handler;
-
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
